@@ -1,10 +1,12 @@
 """ Build module for building 10s ai."""
 from invoke import task
-from settings import LOCAL_DB_CMD, LOCAL_DB_DOWN_CMD, TEST_CMD, PIP_CMD
+from settings import LOCAL_DB_CMD, LOCAL_DB_DOWN_CMD, \
+    TEST_CMD, PIP_CMD, LINT_CMD
 
 
 @task
 def pip(ctx):
+    """ Install pip requirements. """
     ctx.run(PIP_CMD)
 
 
@@ -18,6 +20,12 @@ def local_db(ctx):
 def stop_local_db(ctx):
     """ Stop the local db instance. """
     ctx.run(LOCAL_DB_DOWN_CMD)
+
+
+@task
+def lint(ctx):
+    """ Perform lint checking. """
+    ctx.run(LINT_CMD)
 
 
 @task
@@ -42,5 +50,6 @@ def stop(ctx):
 def build(ctx):
     """ Perform the automated build process. """
     start(ctx)
+    lint(ctx)
     test(ctx)
     stop(ctx)
