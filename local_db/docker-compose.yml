@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+   db:
+     image: cnadiminti/dynamodb-local:latest
+     ports:
+       - "8000:8000"
+     volumes:
+       - db_data:${PWD}/dynamodb_local_db
+     restart: always
+     container_name: local_dynamo_db
+
+volumes:
+    db_data:

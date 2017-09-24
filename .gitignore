@@ -1,0 +1,6 @@
+*.pyc
+__pycache__
+.idea
+.coverage
+local_db/shared-local-instance.db
+
