@@ -7,10 +7,10 @@ def test_client():
     """ For a Boto3 client. """
     dynamo_client = client(DB_MODULE_NAME, endpoint_url=DB_CONNECTION_URL)
     response = dynamo_client.list_tables()
-    print(response)
+    return response
 
 
 def test_service_resource():
     """ For a Boto3 service resource. """
     dynamo_service = resource(DB_MODULE_NAME, endpoint_url=DB_CONNECTION_URL)
-    print(list(dynamo_service.tables.all()))
+    return list(dynamo_service.tables.all())
