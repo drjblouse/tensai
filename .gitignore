@@ -2,5 +2,6 @@
 __pycache__
 .idea
 .coverage
+venv
 local_db/shared-local-instance.db
 
