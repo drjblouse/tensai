@@ -1,3 +1,18 @@
+from invoke import run
+
+
+def check_local_db():
+    """ Check if the local db is running. """
+    try:
+        return run(Constants.LOCAL_DB_RUNNING_CMD).ok
+    except(ValueError, Exception):
+        return False
+
+
+class Messages(object):
+    """ Defined Messages. """
+    NO_LOCAL_DB = 'Local DB not running.'
+
 
 class Constants(object):
     """Defined Constants."""
@@ -24,6 +39,10 @@ class Constants(object):
     DEFAULT_CONFIDENCE = 50.0
     PAGE_START = 0
     EMPTY = ''
+    NAME = 'name'
+    TEST = 'test'
+    RULES = 'rules'
+    COMPANIES = 'companies'
     UNDEFINED = 'undefined'
     ASSERT_FACT = 'assert_fact'
     ADD_FACT = 'add_fact'
@@ -32,7 +51,6 @@ class Constants(object):
     ADD_RULE = 'add_rule'
     UPDATE_RULE = 'update_rule'
     DELETE_RULE = 'delete_rule'
-    CHANGE_MODE = 'change_mode'
     RUN_INFERENCE = 'run_inference'
     INFERENCE_STARTED = 'inference_started'
     RULE_FIRED = 'rule_fired'
@@ -40,22 +58,6 @@ class Constants(object):
     ASK_QUESTION = 'ask_question'
     ANSWER_QUESTION = 'answer_question'
     EXECUTE_CODE = 'execute_code'
-    FACT_KEY = 'fact'
-    FACTS_KEY = 'facts'
-    RULE_KEY = 'rule'
-    BODY_KEY = 'body'
-    ACTION_KEY = 'action'
-    ACTIONS_KEY = 'actions'
-    ACTION_TYPE_KEY = 'action_type'
-    TYPE_KEY = 'type'
-    MODE_KEY = 'mode'
-    NAME_KEY = 'name'
-    GRAPH_KEY = 'graph'
-    PRIORITY_KEY = 'priority'
-    CONFIDENCE_KEY = 'confidence'
-    ACTIVATED_KEY = 'activated'
-    TIME_KEY = 'time'
-    FACT_TYPE_KEY = 'fact_type'
     NORMAL = 'normal'
     ADVANCED = 'advanced'
     EXPERT = 'expert'
