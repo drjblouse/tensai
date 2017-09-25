@@ -4,7 +4,7 @@ services:
    db:
      image: cnadiminti/dynamodb-local:latest
      ports:
-       - "8000:8000"
+       - "${DB_PORT}:8000"
      volumes:
        - db_data:${PWD}/dynamodb_local_db
      restart: always
