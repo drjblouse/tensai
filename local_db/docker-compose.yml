@@ -10,5 +10,15 @@ services:
      restart: always
      container_name: local_dynamo_db
 
+   scratch:
+     image: cassandra
+     ports:
+       - "${SCRATCH_PORT}:7000"
+     volumes:
+       - scratch_data:${PWD}/scratch
+     restart: always
+     container_name: local_cassandra
+
 volumes:
     db_data:
+    scratch_data:

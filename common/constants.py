@@ -22,13 +22,16 @@ class Constants(object):
     DB_KEY_KEY = 'key'
     LOCAL_IP = '127.0.0.1'
     LOCAL_DB_PORT = 8088
+    LOCAL_SCRATCH_PORT = 7088
 
     # The following are build commands
     PIP_CMD = 'pip install -r requirements.pip'
-    LOCAL_DB_CMD = 'cd local_db && DB_PORT={0} docker-compose up -d'.format(
-        LOCAL_DB_PORT)
-    LOCAL_DB_DOWN_CMD = 'cd local_db && DB_PORT={0} docker-compose down'.format(
-        LOCAL_DB_PORT)
+    LOCAL_DB_CMD = 'cd local_db && DB_PORT={0} SCRATCH_PORT={1} ' \
+                   'docker-compose up -d'.format(LOCAL_DB_PORT,
+                                                 LOCAL_SCRATCH_PORT)
+    LOCAL_DB_DOWN_CMD = 'cd local_db && DB_PORT={0} SCRATCH_PORT={1} ' \
+                        'docker-compose down'.format(LOCAL_DB_PORT,
+                                                     LOCAL_SCRATCH_PORT)
     TEST_CMD = 'nosetests --with-coverage --cover-package=common ' \
                '--cover-min-percentage=80'
     LINT_CMD = 'pyflakes *.py && pylint *.py'
