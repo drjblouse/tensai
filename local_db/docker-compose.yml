@@ -1,24 +1,9 @@
 version: '3'
-
 services:
-   db:
-     image: cnadiminti/dynamodb-local:latest
-     ports:
-       - "${DB_PORT}:8000"
-     volumes:
-       - db_data:${PWD}/dynamodb_local_db
-     restart: always
-     container_name: local_dynamo_db
+  mongo:
+    image: mongo
+    ports:
+     - "27017:27017"
+    restart: always
+    container_name: mongo
 
-   scratch:
-     image: cassandra
-     ports:
-       - "${SCRATCH_PORT}:7000"
-     volumes:
-       - scratch_data:${PWD}/scratch
-     restart: always
-     container_name: local_cassandra
-
-volumes:
-    db_data:
-    scratch_data:

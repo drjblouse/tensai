@@ -1,68 +1,58 @@
 """Support types for the 10s ai platform."""
 # -*- coding: utf-8 -*-
-import uuid
 from datetime import datetime
-from inflect import engine
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 from common.constants import Constants
-from common.graph import GraphStore
-from schematics.models import Model
-from schematics import types as fields
 
 
-class PersistentType(Model):
-    """ Base type for all other types. """
-    key = fields.UUIDType(required=True, default=uuid.uuid4().hex)
-    created = fields.DateTimeType(default=datetime.now())
-    updated = fields.DateTimeType(default=datetime.now())
+class KnowledgeItem(object):
+    def __init__(self, collection, client=MongoClient()):
+        """ Create the base type data. """
+        self._client = client
+        self.db = self._client.tensai
+        self.collection = self.db[collection]
+        self.doc = dict()
+        created = datetime.now().strftime(Constants.DATE_FORMAT)
+        self.doc[Constants.CREATED_KEY] = created
+        self.doc[Constants.UPDATED_KEY] = created
 
-    def type(self):
-        """ Default type initializer. """
-        return engine().plural(type(self).__name__.lower(), 2)
+    def __getitem__(self, k):
+        """ Get an element from the document. """
+        return self.doc[k]
 
-    def create_table(self, graph=GraphStore()):
-        """ Default create table function. """
-        graph.create_table(self.type())
+    def __setitem__(self, k, v):
+        """ Set an element in the document. """
+        self.doc[k] = v
 
-    def delete_table(self, graph=GraphStore()):
-        """ Default delete table function. """
-        graph.delete_table(self.type())
+    def item_count(self):
+        return self.collection.count()
 
-    def put_type(self, graph=GraphStore()):
-        """ Default save function. """
-        try:
-            return graph.put_item(self.type(), self)
-        except(ValueError, Exception):
-            return None
+    def save(self):
+        self.doc[Constants.UPDATED_KEY] = datetime.now().strftime(Constants.DATE_FORMAT)
+        return self.collection.insert_one(self.doc).inserted_id
 
-    def get_type(self, graph=GraphStore()):
-        """ Default save function. """
-        return graph.get_item(self.type(), self.key)
+    def get(self, object_id):
+        return self.collection.find_one({Constants.ID: ObjectId(object_id)})
 
-    def delete_type(self, graph=GraphStore()):
-        """ Default save function. """
-        return graph.delete_item(self.type(), self.key)
+    def delete(self, object_id):
+        self.collection.delete_one({Constants.ID: ObjectId(object_id)})
 
-
-class Fact(PersistentType):
-    """This class defines the fact type for solomon."""
-    name = fields.StringType(required=True, max_length=150)
-    activated = fields.BooleanType(default=False)
-    confidence = fields.DecimalType(default=Constants.DEFAULT_CONFIDENCE)
-    fact_type = fields.StringType(default=Constants.STATEMENT)
+    def purge(self):
+        self.collection.drop()
 
 
-class Action(PersistentType):
-    """This class represents the possible actions for the right hand sides."""
-    name = fields.StringType(required=True, max_length=150)
-    action_type = fields.StringType(default=Constants.UNDEFINED,
-                                    max_length=150)
-    action = fields.StringType(required=True, max_length=150)
-    priority = fields.IntType(default=Constants.DEFAULT_PRIORITY)
+class Fact(KnowledgeItem):
+    """ Fact type. """
+    def __init__(self, client=MongoClient(), **kwargs):
+        """ Initializer. """
+        super().__init__(Constants.FACTS_COLLECTION, client)
+        self.doc.update(kwargs)
 
 
-class Rule(PersistentType):
-    """This class defines the rule type for solomon."""
-    name = fields.StringType(required=True, max_length=150)
-    priority = fields.IntType(default=Constants.DEFAULT_PRIORITY)
-    facts = fields.ListType(fields.ModelType(Fact))
-    actions = fields.ListType(fields.ModelType(Action))
+class Action(KnowledgeItem):
+    """ Action type. """
+    def __init__(self, client=MongoClient(), **kwargs):
+        """ Initializer. """
+        super().__init__(Constants.ACTIONS_COLLECTION, client)
+        self.doc.update(kwargs)
