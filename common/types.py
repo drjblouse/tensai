@@ -56,3 +56,11 @@ class Action(KnowledgeItem):
         """ Initializer. """
         super().__init__(Constants.ACTIONS_COLLECTION, client)
         self.doc.update(kwargs)
+
+
+class Rule(KnowledgeItem):
+    """ Rule type. """
+    def __init__(self, client=MongoClient(), **kwargs):
+        """ Initializer. """
+        super().__init__(Constants.RULES_COLLECTION, client)
+        self.doc.update(kwargs)

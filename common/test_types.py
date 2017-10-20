@@ -1,6 +1,6 @@
 from unittest import TestCase, skipIf
 from pymongo import MongoClient, errors
-from common.types import Fact, Action
+from common.types import Fact, Action, Rule
 from common.constants import Constants, Messages
 
 
@@ -23,6 +23,7 @@ class TestTypes(TestCase):
     def setUp(self):
         Fact().purge()
         Action().purge()
+        Rule().purge()
 
     def test_fact_creation(self):
         activated = False
@@ -44,3 +45,14 @@ class TestTypes(TestCase):
         self.assertEqual(Action().item_count(), 1)
         Action().delete(key)
         self.assertEqual(Action().item_count(), 0)
+
+    def test_rule_creation(self):
+        rule = Rule(test=DUMMY_VALUE)
+        rule[Constants.PRIORITY_KEY] = 80
+        key = rule.save()
+        read_rule = Rule().get(key)
+        self.assertEqual(read_rule[TEST_KEY], rule[TEST_KEY])
+        self.assertEqual(read_rule[Constants.PRIORITY_KEY], rule[Constants.PRIORITY_KEY])
+        self.assertEqual(Rule().item_count(), 1)
+        Rule().delete(key)
+        self.assertEqual(Rule().item_count(), 0)

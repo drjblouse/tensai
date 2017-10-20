@@ -17,7 +17,6 @@ class Constants(object):
     FACTS_COLLECTION = 'Facts'
     ACTIONS_COLLECTION = 'Actions'
     RULES_COLLECTION = 'Rules'
-    RULES_EDGE = 'Rule'
     KNOWLEDGE_GRAPH = 'Knowledge'
 
     DEFAULT_PRIORITY = 0
