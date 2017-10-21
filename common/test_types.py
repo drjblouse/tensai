@@ -1,6 +1,6 @@
 from unittest import TestCase, skipIf
 from pymongo import MongoClient, errors
-from common.types import Fact, Action, Rule
+from common.types import KnowledgeItems
 from common.constants import Constants, Messages
 
 
@@ -21,38 +21,31 @@ DUMMY_VALUE = 'fact_value'
 @skipIf(not check_local_db(), reason=Messages.NO_LOCAL_DB)
 class TestTypes(TestCase):
     def setUp(self):
-        Fact().purge()
-        Action().purge()
-        Rule().purge()
+        KnowledgeItems.Fact().purge()
+        KnowledgeItems.Action().purge()
+        KnowledgeItems.Rule().purge()
+
+    def test_types(self):
+        for item in KnowledgeItems().Items:
+            self._test_item_type(item)
 
     def test_fact_creation(self):
         activated = False
         keys = list()
         for x in range(100):
             activated = not activated
-            fact = Fact(value=DUMMY_VALUE+str(x), activated=activated)
+            fact = KnowledgeItems.Fact(value=DUMMY_VALUE+str(x), activated=activated)
             keys.append(fact.save())
-        self.assertEqual(Fact().item_count(), 100)
-        self.assertEqual(Fact().get(keys[5])[Constants.VALUE_KEY], DUMMY_VALUE+str(5))
+        self.assertEqual(KnowledgeItems.Fact().item_count(), 100)
+        self.assertEqual(KnowledgeItems.Fact().get(keys[5])[Constants.VALUE_KEY], DUMMY_VALUE+str(5))
 
-    def test_action_creation(self):
-        action = Action(test=DUMMY_VALUE)
-        action[Constants.PRIORITY_KEY] = 80
-        key = action.save()
-        read_action = Action().get(key)
-        self.assertEqual(read_action[TEST_KEY], action[TEST_KEY])
-        self.assertEqual(read_action[Constants.PRIORITY_KEY], action[Constants.PRIORITY_KEY])
-        self.assertEqual(Action().item_count(), 1)
-        Action().delete(key)
-        self.assertEqual(Action().item_count(), 0)
-
-    def test_rule_creation(self):
-        rule = Rule(test=DUMMY_VALUE)
-        rule[Constants.PRIORITY_KEY] = 80
-        key = rule.save()
-        read_rule = Rule().get(key)
-        self.assertEqual(read_rule[TEST_KEY], rule[TEST_KEY])
-        self.assertEqual(read_rule[Constants.PRIORITY_KEY], rule[Constants.PRIORITY_KEY])
-        self.assertEqual(Rule().item_count(), 1)
-        Rule().delete(key)
-        self.assertEqual(Rule().item_count(), 0)
+    def _test_item_type(self, item):
+        type_item = item(test=DUMMY_VALUE)
+        type_item[Constants.PRIORITY_KEY] = 80
+        key = type_item.save()
+        read_item = item().get(key)
+        self.assertEqual(read_item[TEST_KEY], type_item[TEST_KEY])
+        self.assertEqual(read_item[Constants.PRIORITY_KEY], type_item[Constants.PRIORITY_KEY])
+        self.assertEqual(item().item_count(), 1)
+        item().delete(key)
+        self.assertEqual(item().item_count(), 0)

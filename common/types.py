@@ -42,25 +42,37 @@ class KnowledgeItem(object):
         self.collection.drop()
 
 
-class Fact(KnowledgeItem):
-    """ Fact type. """
-    def __init__(self, client=MongoClient(), **kwargs):
-        """ Initializer. """
-        super().__init__(Constants.FACTS_COLLECTION, client)
-        self.doc.update(kwargs)
+class KnowledgeItems(object):
+    def __init__(self):
+        self.Items = [KnowledgeItems.Fact,
+                      KnowledgeItems.Rule,
+                      KnowledgeItems.Action,
+                      KnowledgeItems.Agenda]
 
+    class Fact(KnowledgeItem):
+        """ Fact type. """
+        def __init__(self, client=MongoClient(), **kwargs):
+            """ Initializer. """
+            super().__init__(Constants.FACTS_COLLECTION, client)
+            self.doc.update(kwargs)
 
-class Action(KnowledgeItem):
-    """ Action type. """
-    def __init__(self, client=MongoClient(), **kwargs):
-        """ Initializer. """
-        super().__init__(Constants.ACTIONS_COLLECTION, client)
-        self.doc.update(kwargs)
+    class Action(KnowledgeItem):
+        """ Action type. """
+        def __init__(self, client=MongoClient(), **kwargs):
+            """ Initializer. """
+            super().__init__(Constants.ACTIONS_COLLECTION, client)
+            self.doc.update(kwargs)
 
+    class Rule(KnowledgeItem):
+        """ Rule type. """
+        def __init__(self, client=MongoClient(), **kwargs):
+            """ Initializer. """
+            super().__init__(Constants.RULES_COLLECTION, client)
+            self.doc.update(kwargs)
 
-class Rule(KnowledgeItem):
-    """ Rule type. """
-    def __init__(self, client=MongoClient(), **kwargs):
-        """ Initializer. """
-        super().__init__(Constants.RULES_COLLECTION, client)
-        self.doc.update(kwargs)
+    class Agenda(KnowledgeItem):
+        """ Agenda type. """
+        def __init__(self, client=MongoClient(), **kwargs):
+            """ Initializer. """
+            super().__init__(Constants.AGENDA_COLLECTION, client)
+            self.doc.update(kwargs)

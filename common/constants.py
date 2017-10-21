@@ -9,14 +9,10 @@ class Constants(object):
     """Defined Constants."""
     PLATFORM_NAME = '10sai'
     DB_NAME = 'tensai'
-    GRAPH_COLLECTION_NAME = 'knowledge'
-    USER = 'root'
-    PASSWORD = 'pwd'
-    LOCAL_IP = '127.0.0.1'
-    LOCAL_DB_PORT = 8529
     FACTS_COLLECTION = 'Facts'
     ACTIONS_COLLECTION = 'Actions'
     RULES_COLLECTION = 'Rules'
+    AGENDA_COLLECTION = 'Agenda'
     KNOWLEDGE_GRAPH = 'Knowledge'
 
     DEFAULT_PRIORITY = 0
