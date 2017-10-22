@@ -14,6 +14,9 @@ class Constants(object):
     RULES_COLLECTION = 'Rules'
     AGENDA_COLLECTION = 'Agenda'
     KNOWLEDGE_GRAPH = 'Knowledge'
+    RULE_TO_FACTS = 'rule_facts'
+    RULE_TO_ACTIONS = 'rule_actions'
+    KEY_FORMAT = '{prefix}:{key}'
 
     DEFAULT_PRIORITY = 0
     DEFAULT_CONFIDENCE = 50.0
@@ -21,6 +24,9 @@ class Constants(object):
     EMPTY = ''
     ID = '_id'
     FACT = 'fact'
+    FACTS = 'facts'
+    ACTION = 'action'
+    ACTIONS = 'actions'
     NAME = 'name'
     TEST = 'test'
     RULES = 'rules'
@@ -56,3 +62,7 @@ class Constants(object):
     MATH = 'math'
     SET_VARIABLE = 'set_variable'
     DEFINITION = 'definition'
+
+    @staticmethod
+    def get_key(prefix, key):
+        return Constants.KEY_FORMAT.format(prefix=prefix, key=key)
