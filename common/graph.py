@@ -4,7 +4,19 @@ from schematics.models import Model
 from schematics.types import StringType, ListType, IntType, \
     BooleanType, DecimalType
 from redis import Redis
+from neo4j.v1 import GraphDatabase, basic_auth
 from common.constants import Constants
+
+
+class Graph(object):
+    def __init__(self):
+        self.driver = GraphDatabase.driver(
+            Constants.GRAPH_URL,
+            auth=basic_auth(Constants.USER, Constants.PASSWORD))
+        self.session = self.driver.session()
+
+    def create_relations(self, knowledge):
+        pass
 
 
 class Entity(Model):
