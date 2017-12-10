@@ -2,9 +2,11 @@
 from invoke import task
 
 PIP_CMD = 'pip install -r requirements.pip'
-TEST_CMD = 'rm .coverage && nosetests --with-coverage --cover-package=common ' \
+TEST_CMD = 'rm .coverage && nosetests --with-coverage ' \
+           '--cover-package=common ' \
            '--cover-min-percentage=80'
-LINT_CMD = 'pyflakes *.py && pylint *.py'
+LINT_CMD = 'pyflakes *.py && pylint *.py && flake8 *.py ' \
+           '&& pycodestyle --statistics -qq *.py'
 
 
 @task

@@ -1,90 +1,47 @@
 """Support types for the 10s ai platform."""
 # -*- coding: utf-8 -*-
-from schematics.models import Model
-from schematics.types import StringType, ListType, IntType, \
-    BooleanType, DecimalType
-from redis import Redis
-from neo4j.v1 import GraphDatabase, basic_auth
+from neomodel import StructuredNode, StringProperty, \
+    RelationshipTo, RelationshipFrom, config, IntegerProperty
 from common.constants import Constants
 
 
+config.DATABASE_URL = Constants.GRAPH_URL
+
+
+class BaseNode(StructuredNode):
+    @classmethod
+    def category(cls):
+        pass
+    id = StringProperty(unique_index=True)
+    confidence = IntegerProperty(default=Constants.DEFAULT_CONFIDENCE)
+    priority = IntegerProperty(default=Constants.DEFAULT_PRIORITY)
+
+
+class FactNode(BaseNode):
+    rules = RelationshipTo(Constants.RULE_NODE, Constants.FACT_RULE_RELATION)
+
+
+class ActionNode(BaseNode):
+    rules = RelationshipFrom(
+        Constants.RULE_NODE, Constants.FACT_RULE_RELATION)
+
+
+class RuleNode(BaseNode):
+    facts = RelationshipFrom(
+        Constants.FACT_NODE, Constants.FACT_RULE_RELATION)
+    actions = RelationshipTo(
+        Constants.ACTION_NODE, Constants.RULE_ACTION_RELATION)
+
+
 class Graph(object):
-    def __init__(self):
-        self.driver = GraphDatabase.driver(
-            Constants.GRAPH_URL,
-            auth=basic_auth(Constants.USER, Constants.PASSWORD))
-        self.session = self.driver.session()
+    def __init__(self, graph):
+        self.graph = graph
 
-    def create_relations(self, knowledge):
-        pass
-
-
-class Entity(Model):
-    name = StringType(required=True)
-
-
-class Fact(Entity):
-    activated = BooleanType(default=False)
-    confidence = DecimalType(default=Constants.DEFAULT_CONFIDENCE)
-
-
-class Action(Entity):
-    action = StringType(required=True)
-
-
-class Rule(Entity):
-    priority = IntType(default=Constants.DEFAULT_PRIORITY)
-    facts = ListType(StringType)
-    actions = ListType(StringType)
-
-
-class Knowledge(object):
-    """ Knowledge class for managing knowledge. """
-    def __init__(self,  client=Redis()):
-        """ Initialize. """
-        self.client = client
-
-    def assert_fact(self, fact):
-        """ Assert a new fact as being known knowledge. """
-        key = Constants.get_key(Constants.FACTS_COLLECTION, fact.name)
-        self.client.set(key, fact)
-
-    def retract_fact(self, fact):
-        """ Retract the fact as being now unknown. """
-        key = Constants.get_key(Constants.FACTS_COLLECTION, fact.name)
-        self.client.delete(key)
-
-    def fact_exists(self, fact):
-        """ Check to see if fact exists. """
-        key = Constants.get_key(Constants.FACTS_COLLECTION, fact.name)
-        return self.client.get(key) is not None
-
-    def add_rule(self, rule):
-        """ Add a new rule and create graph to facts. """
-        key = Constants.get_key(Constants.RULES_COLLECTION, rule.name)
-        if rule.facts:
-            for fact in rule.facts:
-                fact_key = Constants.get_key(Constants.RULE_TO_FACTS, key)
-                self.client.rpush(fact_key, fact)
-        if rule.actions:
-            for action in rule.actions:
-                action_key = Constants.get_key(Constants.RULE_TO_ACTIONS, key)
-                self.client.rpush(action_key, action)
-        self.client.set(key, rule)
-
-    def rule_exists(self, rule):
-        """ Check to see if rule exists. """
-        key = Constants.get_key(Constants.RULES_COLLECTION, rule.name)
-        return self.client.get(key) is not None
-
-    def remove_rule(self, rule):
-        """ Remove a rule from the knowledge tree. """
-        key = Constants.get_key(Constants.RULES_COLLECTION, rule.name)
-        self.client.delete(key)
-        fact_key = Constants.get_key(Constants.RULE_TO_FACTS, key)
-        self.client.delete(fact_key)
-        action_key = Constants.get_key(Constants.RULE_TO_ACTIONS, key)
-        self.client.delete(action_key)
-
-    def process_agenda(self):
-        pass
+    def create_rule(self, rule_id, facts, actions,
+                    confidence=Constants.DEFAULT_CONFIDENCE,
+                    priority=Constants.DEFAULT_PRIORITY):
+        rule = RuleNode(id=rule_id, confidence=confidence, priority=priority)
+        # for fact in facts:
+        #     rule.facts.connect(fact)
+        # for action in actions:
+        #     rule.actions.connect(action)
