@@ -1,47 +1,28 @@
 """Support types for the 10s ai platform."""
 # -*- coding: utf-8 -*-
-from neomodel import StructuredNode, StringProperty, \
-    RelationshipTo, RelationshipFrom, config, IntegerProperty
+from neo4jrestclient.client import GraphDatabase
 from common.constants import Constants
 
 
-config.DATABASE_URL = Constants.GRAPH_URL
-
-
-class BaseNode(StructuredNode):
-    @classmethod
-    def category(cls):
-        pass
-    id = StringProperty(unique_index=True)
-    confidence = IntegerProperty(default=Constants.DEFAULT_CONFIDENCE)
-    priority = IntegerProperty(default=Constants.DEFAULT_PRIORITY)
-
-
-class FactNode(BaseNode):
-    rules = RelationshipTo(Constants.RULE_NODE, Constants.FACT_RULE_RELATION)
-
-
-class ActionNode(BaseNode):
-    rules = RelationshipFrom(
-        Constants.RULE_NODE, Constants.FACT_RULE_RELATION)
-
-
-class RuleNode(BaseNode):
-    facts = RelationshipFrom(
-        Constants.FACT_NODE, Constants.FACT_RULE_RELATION)
-    actions = RelationshipTo(
-        Constants.ACTION_NODE, Constants.RULE_ACTION_RELATION)
-
-
 class Graph(object):
-    def __init__(self, graph):
-        self.graph = graph
+    def __init__(self, graph=None):
+        self.graph = graph or GraphDatabase(Constants.GRAPH_URL)
+        self.facts = self.graph.labels.create(Constants.FACTS)
+        self.rules = self.graph.labels.create(Constants.RULES)
+        self.actions = self.graph.labels.create(Constants.ACTIONS)
 
-    def create_rule(self, rule_id, facts, actions,
+    def create_rule(self, rule_id, rule_name, facts, actions,
                     confidence=Constants.DEFAULT_CONFIDENCE,
                     priority=Constants.DEFAULT_PRIORITY):
-        rule = RuleNode(id=rule_id, confidence=confidence, priority=priority)
-        # for fact in facts:
-        #     rule.facts.connect(fact)
-        # for action in actions:
-        #     rule.actions.connect(action)
+        fact_nodes = list()
+        action_nodes = list()
+        for fact in facts:
+            fact_nodes.append(self.facts.create(name=fact.name))
+        for action in actions:
+            action_nodes.append(self.actions.create(name=action.name))
+        rule = self.rules.create(id=rule_id, name=rule_name, confidence=confidence, priority=priority)
+        for fact in fact_nodes:
+            fact.relationships.create(Constants.FACT_RULE_RELATION, rule)
+        for action in action_nodes:
+            rule.relationships.create(Constants.RULE_ACTION_RELATION, action)
+

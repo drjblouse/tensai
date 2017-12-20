@@ -85,7 +85,11 @@ class Queries:
     # QUERIES
     ######################################################################
     PURGE_GRAPH = 'MATCH (node) DETACH DELETE node'
-    CREATE_FACT_QUERY = 'CREATE (f:fact {{ name: "{name}", ' \
+    CREATE_NODE_QUERY = 'CREATE (n:node {{ id: "{id}", name: "{name}", ' \
+                        'activated: "{activated}", ' \
+                        'confidence: "{confidence}", priority: "{priority}"' \
+                        'time: "{time}", type: "{type}" }})'
+    CREATE_FACT_QUERY = 'CREATE (f:fact {{ id: "{id}", name: "{name}", ' \
                         'activated: "{activated}", ' \
                         'confidence: "{confidence}", ' \
                         'time: "{time}", type: "{type}" }})'
