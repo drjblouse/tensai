@@ -9,7 +9,7 @@ class Constants(object):
     """Defined Constants."""
     PLATFORM_NAME = '10sai'
     DB_NAME = 'tensai'
-    GRAPH_URL = 'bolt://neo4j:test@localhost:7687'
+    GRAPH_URL = 'http://localhost:7474'
     USER = 'neo4j'
     PASSWORD = 'neo4j'
     CYPHER_LOG = 'CYPHER: {0}'
