@@ -2,6 +2,7 @@ from unittest import TestCase, skipIf
 from unittest.mock import MagicMock
 from common.types import Fact, Action
 from common.graph import Graph
+from invoke import run
 
 TEST_RULE = 'dummy rule'
 TEST_FACT = 'dummy fact'
@@ -9,7 +10,11 @@ TEST_ACTION = 'dummy action'
 
 
 def graph_is_down():
-    return True
+    try:
+        result = run('wget localhost:7474 --timeout 05 -O - 2>/dev/null > /dev/null')
+        return not result.ok
+    except (ValueError, Exception):
+        return True
 
 
 class TestGraph(TestCase):
