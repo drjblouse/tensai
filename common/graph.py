@@ -1,7 +1,8 @@
 """Support types for the 10s ai platform."""
 # -*- coding: utf-8 -*-
+from itertools import chain
 from neo4jrestclient.client import GraphDatabase
-from common.constants import Constants
+from common.constants import Constants, Queries
 from common.types import log_exceptions
 
 
@@ -103,4 +104,13 @@ class Graph(object):
         self.helper.create_action_relations(action_nodes, rule)
         return rule
 
+    @log_exceptions
+    def get_fact(self, fact_name):
+        return self.graph.query(Queries.GET_FACT_QUERY.format(name=fact_name),
+                                data_contents=True)
 
+    @log_exceptions
+    def get_rules_by_fact(self, fact_name):
+        rules = self.graph.query(Queries.GET_FACT_RULES.format(name=fact_name),
+                                 data_contents=True)
+        return list(chain.from_iterable(rules.rows))

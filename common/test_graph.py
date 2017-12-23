@@ -1,5 +1,7 @@
 from unittest import TestCase, skipIf
 from unittest.mock import MagicMock
+
+from common.constants import Constants
 from common.types import Fact, Action
 from common.graph import Graph
 from invoke import run
@@ -42,6 +44,22 @@ class TestGraph(TestCase):
         self.assertEqual(graph.get_fact_count(), 2)
         self.assertEqual(graph.get_action_count(), 2)
 
+    def test_get_fact(self):
+        mock = MagicMock()
+        mock.labels.create.return_value = mock
+        mock.query.return_value = mock
+        graph = Graph(mock)
+        self.assertIs(graph.get_fact(TEST_FACT), mock)
+        self.assertIsNotNone(graph.get_fact(TEST_FACT))
+
+    def test_get_rules_by_fact(self):
+        mock = MagicMock()
+        mock.labels.create.return_value = mock
+        mock.query.return_value = mock
+        mock.rows = [[mock], [mock], [mock]]
+        graph = Graph(mock)
+        self.assertIs(len(graph.get_rules_by_fact(TEST_FACT)), 3)
+
     @skipIf(graph_is_down(), 'Graph is not running so skipping...')
     def test_real_graph(self):
         graph = Graph()
@@ -52,3 +70,15 @@ class TestGraph(TestCase):
         self.assertEqual(graph.get_rule_count(), 1)
         self.assertEqual(graph.get_fact_count(), 1)
         self.assertEqual(graph.get_action_count(), 1)
+
+    @skipIf(graph_is_down(), 'Graph is not running so skipping...')
+    def test_graph_fact_rules(self):
+        graph = Graph()
+        graph.purge_graph()
+        graph.create_rule(TEST_RULE, TEST_RULE, [Fact(TEST_FACT)], [Action(TEST_ACTION)])
+        self.assertEqual(graph.get_rule_count(), 1)
+        self.assertEqual(graph.get_fact_count(), 1)
+        self.assertEqual(graph.get_action_count(), 1)
+        self.assertIsNotNone(graph.get_fact(TEST_FACT))
+        self.assertIs(len(graph.get_rules_by_fact(TEST_FACT)), 1)
+        self.assertEqual(graph.get_rules_by_fact(TEST_FACT)[0][Constants.NAME], TEST_RULE)

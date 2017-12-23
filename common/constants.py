@@ -18,10 +18,10 @@ class Constants(object):
     ACTIONS_COLLECTION = 'Actions'
     RULES_COLLECTION = 'Rules'
     RULE_NODE = 'RuleNode'
-    FACT_RULE_RELATION = 'RULE'
+    FACT_RULE_RELATION = RULES_COLLECTION
     FACT_NODE = 'FactNode'
     ACTION_NODE = 'ActionNode'
-    RULE_ACTION_RELATION = 'ACTION'
+    RULE_ACTION_RELATION = ACTIONS_COLLECTION
     AGENDA_COLLECTION = 'Agenda'
     KNOWLEDGE_GRAPH = 'Knowledge'
     RULE_TO_FACTS = 'rule_facts'
@@ -84,6 +84,9 @@ class Queries:
     ######################################################################
     # QUERIES
     ######################################################################
+    QUERY_LIMIT = 25
+    GET_FACT_RULES = 'MATCH p=(fact)<-[r:Rules]->(rule) WHERE fact.name="{name}" ' \
+                     'RETURN rule'
     PURGE_GRAPH = 'MATCH (node) DETACH DELETE node'
     CREATE_NODE_QUERY = 'CREATE (n:node {{ id: "{id}", name: "{name}", ' \
                         'activated: "{activated}", ' \
