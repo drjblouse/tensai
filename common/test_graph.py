@@ -19,6 +19,13 @@ class TestGraph(TestCase):
         self.assertIsNotNone(
             graph.create_rule(TEST_RULE, TEST_RULE, [Fact(TEST_FACT)], [Action(TEST_ACTION)]))
 
+    def test_graph_insert_error(self):
+        mock = MagicMock()
+        mock.get_facts.side_effect = Exception
+        graph = Graph(mock, mock)
+        with self.assertRaises(Exception):
+            graph.create_rule(TEST_RULE, TEST_RULE, [Fact(TEST_FACT)], [Action(TEST_ACTION)])
+
     def test_graph_counts(self):
         mock = MagicMock()
         mock.labels.create.return_value = mock
