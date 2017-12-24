@@ -1,16 +1,17 @@
+from os import system
 from unittest.mock import MagicMock
 from pytest import raises
 from common.constants import Constants
 from common.types import Fact, Action
 from common.graph import Graph
-from invoke import run
 
 
-def graph_is_up():
-    try:
-        result = run('wget localhost:7474 --timeout 05 -O - 2>/dev/null > /dev/null')
-        return result.ok
-    except (ValueError, Exception):
+def graph_is_up(runner=system):
+    output = runner('ps aux | grep neo | grep -v grep')
+    print(type(output))
+    if output == 0:
+        return True
+    else:
         return False
 
 
@@ -18,6 +19,18 @@ TEST_RULE = 'dummy rule'
 TEST_RULE2 = 'dummy rule 2'
 TEST_FACT = 'dummy fact'
 TEST_ACTION = 'dummy action'
+
+
+def test_graph_is_up():
+    mock = MagicMock()
+    mock.return_value = 0
+    assert(graph_is_up(mock))
+
+
+def test_graph_is_down():
+    mock = MagicMock()
+    mock.return_value = 1
+    assert(not graph_is_up(mock))
 
 
 def test_graph_insert():
