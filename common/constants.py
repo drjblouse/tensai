@@ -87,6 +87,8 @@ class Queries:
     QUERY_LIMIT = 25
     GET_FACT_RULES = 'MATCH p=(fact)<-[r:Rules]->(rule) WHERE fact.name="{name}" ' \
                      'RETURN rule'
+    GET_RULE_ACTIONS = 'MATCH p=(rule)<-[a:Actions]->(action) WHERE rule.name="{name}" ' \
+                       'RETURN action'
     PURGE_GRAPH = 'MATCH (node) DETACH DELETE node'
     CREATE_NODE_QUERY = 'CREATE (n:node {{ id: "{id}", name: "{name}", ' \
                         'activated: "{activated}", ' \

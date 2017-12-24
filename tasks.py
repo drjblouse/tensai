@@ -2,9 +2,7 @@
 from invoke import task
 
 PIP_CMD = 'pip install -r requirements.pip'
-TEST_CMD = 'rm .coverage && nosetests --with-coverage ' \
-           '--cover-package=common ' \
-           '--cover-min-percentage=80'
+TEST_CMD = 'py.test --cov-report term:skip-covered --cov=common -n 1'
 LINT_CMD = 'pyflakes *.py && pylint *.py && flake8 *.py ' \
            '&& pycodestyle --statistics -qq *.py ' \
            '&& mypy --ignore-missing-imports *.py'

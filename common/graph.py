@@ -8,10 +8,16 @@ from common.types import log_exceptions
 
 class GraphHelper(object):
     @log_exceptions
-    def __init__(self, facts, actions, rules):
+    def __init__(self, graph, facts, actions, rules):
+        self.graph = graph
         self.facts = facts
         self.actions = actions
         self.rules = rules
+
+    @log_exceptions
+    def execute_query(self, query):
+        result = self.graph.query(query, data_contents=True)
+        return list(chain.from_iterable(result.rows))
 
     @staticmethod
     @log_exceptions
@@ -47,7 +53,8 @@ class Graph(object):
         self.facts = self.graph.labels.create(Constants.FACTS)
         self.rules = self.graph.labels.create(Constants.RULES)
         self.actions = self.graph.labels.create(Constants.ACTIONS)
-        self.helper = helper or GraphHelper(self.facts, self.actions, self.rules)
+        self.helper = helper or GraphHelper(
+            self.graph, self.facts, self.actions, self.rules)
 
     @log_exceptions
     def get_rule_count(self):
@@ -111,6 +118,10 @@ class Graph(object):
 
     @log_exceptions
     def get_rules_by_fact(self, fact_name):
-        rules = self.graph.query(Queries.GET_FACT_RULES.format(name=fact_name),
-                                 data_contents=True)
-        return list(chain.from_iterable(rules.rows))
+        return self.helper.execute_query(
+            Queries.GET_FACT_RULES.format(name=fact_name))
+
+    @log_exceptions
+    def get_rule_actions(self, rule_id):
+        return self.helper.execute_query(
+            Queries.GET_RULE_ACTIONS.format(name=rule_id))
