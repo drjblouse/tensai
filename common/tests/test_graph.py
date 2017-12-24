@@ -6,12 +6,12 @@ from common.graph import Graph
 from invoke import run
 
 
-def graph_is_down():
+def graph_is_up():
     try:
         result = run('wget localhost:7474 --timeout 05 -O - 2>/dev/null > /dev/null')
-        return not result.ok
+        return result.ok
     except (ValueError, Exception):
-        return True
+        return False
 
 
 TEST_RULE = 'dummy rule'
@@ -62,31 +62,31 @@ def test_get_rules_by_fact():
     mock.rows = [[mock], [mock], [mock]]
     graph = Graph(mock)
     assert(len(graph.get_rules_by_fact(TEST_FACT)) == 3)
+    assert (len(graph.get_rule_actions(TEST_RULE)) == 3)
 
 
 def test_real_graph():
-    if graph_is_down():
-        return
-    graph = Graph()
-    graph.purge_graph()
-    print(graph.get_rule_count())
-    assert(graph.get_rule_count() == 0)
-    graph.create_rule(TEST_RULE, TEST_RULE, [Fact(TEST_FACT)], [Action(TEST_ACTION)])
-    assert(graph.get_rule_count() == 1)
-    assert(graph.get_fact_count() == 1)
-    assert(graph.get_action_count() == 1)
+    if graph_is_up():
+        graph = Graph()
+        graph.purge_graph()
+        print(graph.get_rule_count())
+        assert(graph.get_rule_count() == 0)
+        graph.create_rule(TEST_RULE, TEST_RULE, [Fact(TEST_FACT)], [Action(TEST_ACTION)])
+        assert(graph.get_rule_count() == 1)
+        assert(graph.get_fact_count() == 1)
+        assert(graph.get_action_count() == 1)
 
 
 def test_graph_fact_rules():
-    if graph_is_down():
-        return
-    graph = Graph()
-    graph.purge_graph()
-    graph.create_rule(TEST_RULE, TEST_RULE, [Fact(TEST_FACT)], [Action(TEST_ACTION)])
-    graph.create_rule(TEST_RULE2, TEST_RULE2, [Fact(TEST_FACT)], [Action(TEST_ACTION)])
-    assert(graph.get_rule_count() == 2)
-    assert(graph.get_fact_count() == 2)
-    assert(graph.get_action_count() == 2)
-    assert(graph.get_fact(TEST_FACT) is not None)
-    assert(len(graph.get_rules_by_fact(TEST_FACT)) == 2)
-    assert(TEST_RULE in graph.get_rules_by_fact(TEST_FACT)[0][Constants.NAME])
+    if graph_is_up():
+        graph = Graph()
+        graph.purge_graph()
+        graph.create_rule(TEST_RULE, TEST_RULE, [Fact(TEST_FACT)], [Action(TEST_ACTION)])
+        graph.create_rule(TEST_RULE2, TEST_RULE2, [Fact(TEST_FACT)], [Action(TEST_ACTION)])
+        assert(graph.get_rule_count() == 2)
+        assert(graph.get_fact_count() == 2)
+        assert(graph.get_action_count() == 2)
+        assert(graph.get_fact(TEST_FACT) is not None)
+        assert(len(graph.get_rules_by_fact(TEST_FACT)) == 2)
+        assert(TEST_RULE in graph.get_rules_by_fact(TEST_FACT)[0][Constants.NAME])
+        assert (TEST_ACTION in graph.get_rule_actions(TEST_RULE)[0][Constants.NAME])
