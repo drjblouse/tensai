@@ -1,5 +1,6 @@
 """Support types for the 10s ai platform."""
 # -*- coding: utf-8 -*-
+from functools import lru_cache
 from itertools import chain
 from neo4jrestclient.client import GraphDatabase
 from common.constants import Constants, Queries
@@ -14,6 +15,7 @@ class GraphHelper(object):
         self.actions = actions
         self.rules = rules
 
+    @lru_cache(maxsize=32)
     @log_exceptions
     def execute_query(self, query):
         result = self.graph.query(query, data_contents=True)
@@ -111,16 +113,19 @@ class Graph(object):
         self.helper.create_action_relations(action_nodes, rule)
         return rule
 
+    @lru_cache(maxsize=32)
     @log_exceptions
     def get_fact(self, fact_name):
         return self.graph.query(Queries.GET_FACT_QUERY.format(name=fact_name),
                                 data_contents=True)
 
+    @lru_cache(maxsize=32)
     @log_exceptions
     def get_rules_by_fact(self, fact_name):
         return self.helper.execute_query(
             Queries.GET_FACT_RULES.format(name=fact_name))
 
+    @lru_cache(maxsize=32)
     @log_exceptions
     def get_rule_actions(self, rule_id):
         return self.helper.execute_query(
