@@ -19,6 +19,10 @@ TEST_RULE = 'dummy rule'
 TEST_RULE2 = 'dummy rule 2'
 TEST_FACT = 'dummy fact'
 TEST_ACTION = 'dummy action'
+DEMO_RULE = 'account access not working'
+DEMO_FACT1 = 'account is NOT locked out'
+DEMO_FACT2 = 'invalid password attempt spotted'
+DEMO_ACTION = 'ask user if password is forgotten'
 
 
 def test_graph_is_up():
@@ -87,6 +91,18 @@ def test_real_graph():
         graph.create_rule(TEST_RULE, TEST_RULE, [Fact(TEST_FACT)], [Action(TEST_ACTION)])
         assert(graph.get_rule_count() == 1)
         assert(graph.get_fact_count() == 1)
+        assert(graph.get_action_count() == 1)
+
+
+def test_demo_graph():
+    if graph_is_up():
+        graph = Graph()
+        graph.purge_graph()
+        print(graph.get_rule_count())
+        assert(graph.get_rule_count() == 0)
+        graph.create_rule(DEMO_RULE, DEMO_RULE, [Fact(DEMO_FACT1), Fact(DEMO_FACT2)], [Action(DEMO_ACTION)])
+        assert(graph.get_rule_count() == 1)
+        assert(graph.get_fact_count() == 2)
         assert(graph.get_action_count() == 1)
 
 
